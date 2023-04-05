@@ -16,7 +16,7 @@ Even though this code was initially developed with Matlab, we've adapted it to O
 
 Note that you can ignore `statistics` if you don't intend to plot the results. This repository also provides and uses the robust PCA code. Please cite the [corresponding paper](https://posenhuang.github.io/papers/RPCA_Separation_ICASSP2012.pdf) if you use it.
 
-## Data
+### Data
 
 We provide in the `data/` folder:
 
