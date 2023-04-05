@@ -21,14 +21,14 @@ Note that you can ignore `statistics` if you don't intend to plot the results. T
 We provide in the `data/` folder:
 
 - The data used for the experiment on fluorescence spectroscopy, which has been provided by Cyril Gobinet from [Université de Reims](https://www.univ-reims.fr/biospect/presentation/membres/membres,22804,37993.html).
-- Short guitar excerpts from the [IDMT-SMT-GUITAR](https://zenodo.org/record/7544110)) databse. Please cite the corresponding paper if you use it.
+- Short guitar excerpts from the [IDMT-SMT-GUITAR](https://zenodo.org/record/7544110) database. Please cite the corresponding paper if you use it.
 
 In addition, our experiments use the [Dexmixing Secret Database (DSD100)](http://www.sisec17.audiolabs-erlangen.de/) for music separation. Download it, and unzip it in the `data` folder (or change the dataset path accordingly).
 
 
 ### Reproducing the papers' results
 
-The files in the `scripts/` folder allows to reproduce the various experiments from our papers (fitting impulsive noise, fluorescence spectroscopy, music inpainting, and music accompaniment enhancement).
+Run the files in the `scripts/` folder to reproduce the various experiments from our papers (fitting impulsive noise, fluorescence spectroscopy, music inpainting, and music accompaniment enhancement).
 
 Several additional scripts are provided in the `analysis/` folder to explore the behavior of Lévy NMF (robustness to initialization, convergence of the algorithms, majorize-equalization performance). 
 
@@ -38,6 +38,6 @@ Several additional scripts are provided in the `analysis/` folder to explore the
 The results from this project have been published in the following papers:
 
 - P. Magron, R. Badeau, A. Liutkus, [Lévy NMF for robust nonnegative source separation](https://hal.science/hal-01548488), Proc. IEEE WASPAA, 2017.
-- P. Magron, R. Badeau, A. Liutkus, [Lévy NMF : un modèle robuste de séparation de sources non-négatives](https://hal.science/hal-01540484), Actes du XXVIe Colloque GRETSI, 2017.
+- P. Magron, R. Badeau, A. Liutkus, [Lévy NMF : un modèle robuste de séparation de sources non-négatives](https://hal.science/hal-01540484), Actes du XXVIe Colloque GRETSI, 2017 (in French).
 
 
