@@ -9,21 +9,6 @@ function r = stablernd(alpha,beta,sigma,mu,m,n,par);
 %
 %   Sample use:
 %       >> r = stablernd(1.5,0.5,1,0,1000,1);
-%
-%	Reference(s):
-%   [1] Sz.Borak, W.Härdle, R.Weron (2005) "Stable distributions", in
-%   "Statistical Tools for Finance and Insurance", eds. P.Cizek, 
-%   W.Härdle, R.Weron, Springer-Verlag, Berlin, 21-44. Available at 
-%   http://ideas.repec.org/p/hum/wpaper/sfb649dp2005-008.html
-%   [2] J.M.Chambers, C.L.Mallows, B.W.Stuck (1976) "A Method for
-%   Simulating Stable Random Variables", JASA 71, 340-344.
-%   [3] J.Nolan (20??) "Stable Distributions: Models for Heavy Tailed Data",
-%   Birkhauser (in progress). Ch.1 at http://academic2.american.edu/~jpnolan
-%	[4] R.Weron (2004) "Computationally intensive Value at Risk 
-%   calculations", in "Handbook of Computational Statistics: Concepts and 
-%   Methods", eds. J.E.Gentle, W.Härdle, Y.Mori, Springer, Berlin, 
-%   911-950. 
-
 %   Written by Rafal Weron (2010.04.26)
 %   Copyright (c) 2010 by Rafal Weron
 

@@ -1,7 +1,10 @@
-clear all; close all; clc;
+function plot_levy_pdf()
 
 x=0:0.01:10;
-l1 = levy_density(x,1); l2 = levy_density(x,2); l3 = levy_density(x,3); l4 = levy_density(x,4);
+l1 = levy_density(x,1);
+l2 = levy_density(x,2);
+l3 = levy_density(x,3);
+l4 = levy_density(x,4);
 
 % Levy density functions
 figure;
@@ -26,3 +29,4 @@ semilogy(x(100:end),r1(100:end),'b--',x(100:end),p1(100:end),'r-.',x(100:end),l1
 h=xlabel('x'); set(h,'Fontsize',16); h=ylabel('p(x|\sigma)'); set(h,'Fontsize',16);
 aa=axis; axis([x(100) x(end) aa(3) aa(4)]);
 
+end

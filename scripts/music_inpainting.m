@@ -1,17 +1,35 @@
+%%% Restoration of music spectrograms corrupted with impulsive noise
+
 clear all; clc; close all;
-Fs = 8000; Nfft = 1000; Nw = 1000; hop = Nw/4;
-Nnmf=200;
-K=30;
-Ndata=1;
+pkg load signal statistics;
+
+% Random seed for reproducibility
+rand("state", 1);
+
+% Data parameters
+Fs = 8000;
+Ndata = 6;
+dataset_path = 'data/guitar/';
+
+% STFT parameters
+Nfft = 1000; Nw = 1000; hop = Nw/4; wtype = 'hann';
+
+% NMF parameters
+Nnmf = 200;
+K = 30;
+
+Ndata=6;
 score = zeros(Ndata,6);
 KLdiv = zeros(Ndata,6);
 
 for it=1:Ndata
+  
     clc; fprintf(' data %d / %d \n',it,Ndata);
-    num_piece = it;
-    [x,X,w,F,T,ts,freq] = get_data_guitar_piece(Fs,Nfft,hop,num_piece);
     
+    [x,X,F,T,ts,freq] = get_data_guitar(dataset_path,it,Fs,Nfft,hop,Nw,wtype);
     V = abs(X);
+    
+    % Initial NMF matrices
     Wini = rand(F,K); Hini = rand(K,T);
 
     % Corruption of the spectrograms
@@ -22,7 +40,6 @@ for it=1:Ndata
     %delta = 1-corr; delta(delta<1)=0;
     delta = ones(F,T);
     
-
     % Reestimation
     [Wis_rest,His_rest] = NMF(V_corr.^2,Wini,Hini,Nnmf,0,0,0,delta);
     Vis_rest = sqrt(Wis_rest*His_rest);
@@ -39,22 +56,21 @@ for it=1:Ndata
     aux = inexact_alm_rpca(V_corr);
     Vr_rest = abs(aux);
     
-    
     % Synthesis
-    Xcorr = V_corr.* exp(1i*angle(X)); xcorr = iSTFT(Xcorr,Nfft,hop);
-    Xl = Vl_rest .* exp(1i*angle(X)); xl = iSTFT(Xl,Nfft,hop);
-    Xis = Vis_rest .* exp(1i*angle(X));  xis = iSTFT(Xis,Nfft,hop);
-    Xc = Vc_rest .* exp(1i*angle(X));  xc = iSTFT(Xc,Nfft,hop);
-    Xr = Vr_rest .* exp(1i*angle(X));  xr = iSTFT(Xr,Nfft,hop);
-    Xkl = Vkl_rest .* exp(1i*angle(X));  xkl = iSTFT(Xkl,Nfft,hop);
+    Xcorr = V_corr.* exp(1i*angle(X)); xcorr = iSTFT(Xcorr, Nfft, hop, Nw, wtype);
+    Xl = Vl_rest .* exp(1i*angle(X)); xl =iSTFT(Xl, Nfft, hop, Nw, wtype);
+    Xis = Vis_rest .* exp(1i*angle(X));  xis =  iSTFT(Xis, Nfft, hop, Nw, wtype);
+    Xc = Vc_rest .* exp(1i*angle(X));  xc =  iSTFT(Xc, Nfft, hop, Nw, wtype);
+    Xr = Vr_rest .* exp(1i*angle(X));  xr = iSTFT(Xr, Nfft, hop, Nw, wtype);
+    Xkl = Vkl_rest .* exp(1i*angle(X));  xkl = iSTFT(Xkl, Nfft, hop, Nw, wtype);
 
     % Score
-    score(it,1) = bss_eval_sources(xcorr,x);
-    score(it,2) = bss_eval_sources(xis,x);
-    score(it,3) = bss_eval_sources(xkl,x);
-    score(it,4) = bss_eval_sources(xc,x);
-    score(it,5) = bss_eval_sources(xr,x);
-    score(it,6) = bss_eval_sources(xl,x);
+    score(it,1) = GetSDR(xcorr,x);
+    score(it,2) = GetSDR(xis,x);
+    score(it,3) = GetSDR(xkl,x);
+    score(it,4) = GetSDR(xc,x);
+    score(it,5) = GetSDR(xr,x);
+    score(it,6) = GetSDR(xl,x);
     
     % KL divergence between spectro
     KLdiv(it,1) = beta_div(V_corr,V,1);
@@ -65,16 +81,6 @@ for it=1:Ndata
     KLdiv(it,6) = beta_div(Vl_rest,V,1);
 
 end
-
-
-% Scaling for plots
-% min_plot = 10^(-1);
-% V = max(V,min_plot); V_corr = max(V_corr,min_plot);
-% Vis_rest = max(Vis_rest,min_plot);
-% Vkl_rest = max(Vkl_rest,min_plot);
-% Vc_rest = max(Vc_rest,min_plot);
-% Vr_rest = max(Vr_rest,min_plot);
-% Vl_rest = max(Vl_rest,min_plot);
 
 % Plot spectrograms
 limtsplot = [-4 max(log10(V_corr(:)))];
@@ -87,14 +93,15 @@ subplot(2,3,4); imagesc(ts,freq,log10(Vc_rest),limtsplot); axis xy; xlabel('Temp
 subplot(2,3,5); imagesc(ts,freq,log10(Vr_rest),limtsplot); axis xy; xlabel('Temps (s)','fontsize',16); title('RPCA','fontsize',16);
 subplot(2,3,6); imagesc(ts,freq,log10(Vl_rest),limtsplot); axis xy; xlabel('Temps (s)','fontsize',16); title('Lévy NMF','fontsize',16);
 hc=colormap(gray); hc=hc(end:-1:1,:); colormap(hc);
-%colormap(jet);
 
-% Display KL divergence
-algos = {'Corrompu','ISNMF','KLKNMF','Cauchy NMF','RPCA','Lévy NMF'};
-figure; boxplot(log10(KLdiv),algos);
+% Plot results (KL div and SDR)
+algos = {'Corrupted','ISNMF','KLKNMF','Cauchy NMF','RPCA','Lévy NMF'};
+Nalgos = length(algos);
+
+figure; boxplot(log10(KLdiv));
+set(gca,'xtick', 1:Nalgos, 'xticklabel', algos,'fontsize',14);
 h=ylabel('$\log (KL)$'); set(h,'Fontsize',16,'interpreter','latex');
 
-% Display DSR
-figure; boxplot(score,algos);
+figure; boxplot(score);
+set(gca,'xtick', 1:Nalgos, 'xticklabel', algos,'fontsize',14);
 h=ylabel('SDR (dB)'); set(h,'Fontsize',16);
-

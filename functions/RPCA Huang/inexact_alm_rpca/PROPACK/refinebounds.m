@@ -23,7 +23,7 @@ eps34 = sqrt(eps*sqrt(eps));
 for l=[-1,1]    
   for i=((j+1)-l*(j-1))/2:l:mid-l
     if abs(D(i+l)-D(i)) < eps34*abs(D(i))
-      if bnd(i)>tol1 & bnd(i+l)>tol1
+      if bnd(i)>tol1 && bnd(i+l)>tol1
 	bnd(i+l) = pythag(bnd(i),bnd(i+l));
 	bnd(i) = 0;
       end

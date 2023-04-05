@@ -1,25 +1,29 @@
-clear all; close all; clc;
-nNMF = 50;
-Nal=3;
+%%% Experiment on fluorescence spectroscopy
 
-data_dir = 'data/';
+clear all; close all; clc;
+pkg load statistics;
+
+% Random seed for reproducibility
+rand("state", 1);
+
+% NMF 
+nNMF = 50;
+Nalgos=3;
+K=3;
 
 % Load fluorescence data
-load(strcat(data_dir,'fluor/ble.mat'));
-
+data_fluor_dir = 'data/fluor/';
+load(strcat(data_fluor_dir,'ble.mat'));
 X=Grain_ble_EUSIPCO_2004.Data; X=X';
 [F,T] = size(X);
-K=3; N=20;
-labs={'Acide félurique lié','Acide félurique libre','Acide paracoumarique'}; longond = 'Longueur d''onde (nm)';
 labs={'Bound feluric acid','Free feluric acid','p-coumaric acid'}; longond = 'Wavelength (nm)';
-
 freq = Grain_ble_EUSIPCO_2004.WvL;
 pos_xy=Grain_ble_EUSIPCO_2004.positions_xy;
 pos_x=Grain_ble_EUSIPCO_2004.positions_x;
 pos_y=Grain_ble_EUSIPCO_2004.positions_y;
 
 % Oracle: load pure spectra and learn activations
-or = load(strcat(data_dir,'fluor/spectre_pur.mat'));
+or = load(strcat(data_fluor_dir,'spectre_pur.mat'));
 Wo = or.data;
 
 Wini=rand(F,K); Hini=rand(K,T);
@@ -38,13 +42,15 @@ Xo = wiener(X,Wo,Ho);
 
 
 % Source separation (generalized Wiener)
-Xe=zeros(F,T,K,Nal);
-Xe(:,:,:,1) = wiener(X,We,He); Xe(:,:,:,2) = wiener(X,Wk,Hk); Xe(:,:,:,3) = wiener(X,Wl,Hl);
+Xe=zeros(F,T,K,Nalgos);
+Xe(:,:,:,1) = wiener(X,We,He);
+Xe(:,:,:,2) = wiener(X,Wk,Hk);
+Xe(:,:,:,3) = wiener(X,Wl,Hl);
 
 
 % Estimation error
-err_kl = zeros(K,Nal); cor=zeros(K,Nal);
-for al=1:Nal
+err_kl = zeros(K,Nalgos); cor=zeros(K,Nalgos);
+for al=1:Nalgos
     for k=1:K
         err_kl(k,al) = beta_div(squeeze(Xo(:,:,k)),squeeze(Xe(:,:,k,al)),1); %KL div
         cor(k,al) = distcorr(squeeze(Xo(:,:,k)),squeeze(Xe(:,:,k,al)));
@@ -58,16 +64,17 @@ set(gca,'XTickLabel',labs);
 ha=ylabel('$\log (d_{KL})$');set(ha,'FontSize',16,'interpreter','latex');
 ha=legend('Euc','KL','Lévy'); set(ha,'FontSize',14);
 
-% Plot corr
+% Plot correlations
 figure;
 bar(cor);
 set(gca,'XTickLabel',labs);
-ha=ylabel('Corrélation');set(ha,'FontSize',16,'interpreter','latex');
+ha=ylabel('Correlation');set(ha,'FontSize',16,'interpreter','latex');
 ha=legend('EuNMF','KLNMF','Lévy NMF'); set(ha,'FontSize',14);
 
 
 
 % Concentrations of components (Oracle case)
+N = 20;
 concentr = zeros(N,N,K);
 figure; colormap(gray);
 for k=1:K

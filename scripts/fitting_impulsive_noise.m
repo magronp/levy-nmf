@@ -1,13 +1,25 @@
-clear all; clc; close all;
-Nnmf=200;
-alpha = 0.1:0.01:0.5; Nalpha=length(alpha);
-Ndata = 100;
+%%% Test the capacity of Lévy NMF to model impulsive noise
 
+clear all; clc; close all;
+pkg load signal statistics;
+
+% Random seed for reproducibility
+rand("state", 1);
+
+% Data parameters
 F=50; T=50; K=5;
+Ndata = 200;
+
+% NMF parameters
+Nnmf=200;
+alpha = 0.1:0.01:0.5;
+Nalpha=length(alpha);
+
+% Initialize loss arrays
 alpha_disp = zeros(Nalpha,5,Ndata);
 kl_div = zeros(Nalpha,5,Ndata);
 
-
+% Loop over data samples
 for it=1:Ndata
     
     % Generate sources

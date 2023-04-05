@@ -62,7 +62,7 @@ function [U,S,V,bnd,j] = lansvd(varargin)
 
 %%%%%%%%%%%%%%%%%%%%% Parse and check input arguments. %%%%%%%%%%%%%%%%%%%%%%
 
-if nargin<1 | length(varargin)<1
+if nargin<1 || length(varargin)<1
   error('Not enough input arguments.');
 end
 
@@ -90,21 +90,21 @@ else
   if length(varargin) < 7, options = []; else options=varargin{7}; end  
 end
 
-if ~isnumeric(n) | real(abs(fix(n))) ~= n | ~isnumeric(m) | ...
-      real(abs(fix(m))) ~= m | ~isnumeric(k) | real(abs(fix(k))) ~= k
+if ~isnumeric(n) || real(abs(fix(n))) ~= n || ~isnumeric(m) || ...
+      real(abs(fix(m))) ~= m || ~isnumeric(k) || real(abs(fix(k))) ~= k
   error('M, N and K must be positive integers.')
 end
 
 
 % Quick return for min(m,n) equal to 0 or 1 or for zero A.
-if min(n,m) < 1 | k<1
+if min(n,m) < 1 || k<1
   if nargout<3
     U = zeros(k,1);
   else
     U = eye(m,k); S = zeros(k,k);  V = eye(n,k);  bnd = zeros(k,1);
   end
   return
-elseif min(n,m) == 1 & k>0
+elseif min(n,m) == 1 && k>0
   if isstr(A)
     % Extract the single column or row of A
     if n==1
@@ -306,11 +306,11 @@ if nargout>2
   V = V*Q;
   for i=1:k     
     nq = norm(V(:,i));
-    if isfinite(nq) & nq~=0 & nq~=1
+    if isfinite(nq) && nq~=0 && nq~=1
       V(:,i) = V(:,i)/nq;
     end
     nq = norm(U(:,i));
-    if isfinite(nq) & nq~=0 & nq~=1
+    if isfinite(nq) && nq~=0 && nq~=1
       U(:,i) = U(:,i)/nq;
     end
   end

@@ -1,6 +1,13 @@
-clear all; close all; clc
+%%% Check methods to estimate the optimal exponent in the ME approach
 
-A=10.^; La=length(A);
+clear all; clc; close all;
+pkg load signal statistics;
+
+% Random seed for reproducibility
+rand("state", 1);
+
+A=0.5:0.05:2;
+La=length(A);
 eta_matlab=zeros(1,La);
 eta_newton=zeros(1,La);
 eta_dicho=zeros(1,La); eta_DL=zeros(1,La);
@@ -31,7 +38,7 @@ for ia=1:La
    % eta_DL(ia) = 1/2+(a*log(a)-a+1)/(a-1)^2;
    
    eta_a_inf_1(ia) = 1/2+sqrt((a*log(a)-a+1)/(2*a*log(a)^2)); %DL en 1/2
-   eta_a_sup_1(ia)= 1/2 + (a.*log(a)-a+1)./(2*(a.^2-a-a.*log(a))); % corde 1/2->1 
+   eta_a_sup_1(ia) = 1/2 + (a.*log(a)-a+1)./(2*(a.^2-a-a.*log(a))); % corde 1/2->1 
    
 end
 eta_DL = eta_a_inf_1; eta_DL(A>1) = eta_a_sup_1(A>1);
@@ -46,4 +53,4 @@ ha=ylabel('$\eta$'); set(ha,'FontSize',16,'interpreter','latex');
 subplot(1,2,2);
 plot(A,100*abs(eta_matlab-eta_newton)./eta_matlab,'b-.',A,100*abs(eta_matlab-eta_DL)./eta_matlab,'r--');
 ha=xlabel('$a$'); set(ha,'FontSize',16,'interpreter','latex');
-ha=ylabel('Erreur (%)'); set(ha,'FontSize',16);
+ha=ylabel('Error (%)'); set(ha,'FontSize',16);

@@ -73,7 +73,7 @@ function [U,B_k,V,p,ierr,work] = lanbpro(varargin)
 % References: 
 % R.M. Larsen, Ph.D. Thesis, Aarhus University, 1998.
 %
-% G. H. Golub & C. F. Van Loan, "Matrix Computations",
+% G. H. Golub && C. F. Van Loan, "Matrix Computations",
 % 3. Ed., Johns Hopkins, 1996.  Section 9.3.4.
 %
 % B. N. Parlett, ``The Symmetric Eigenvalue Problem'', 
@@ -95,13 +95,13 @@ if LANBPRO_TRUTH==1
   global MU_AFTER NU_AFTER MUTRUE_AFTER NUTRUE_AFTER
 end
 
-if nargin<1 | length(varargin)<2
+if nargin<1 || length(varargin)<2
   error('Not enough input arguments.');
 end
 narg=length(varargin);
 
 A = varargin{1};
-if isnumeric(A) | isstruct(A)
+if isnumeric(A) || isstruct(A)
   if isnumeric(A)
     if ~isreal(A)
       error('A must be real')
@@ -111,7 +111,7 @@ if isnumeric(A) | isstruct(A)
     [m n] = size(A.R);
   end
   k=varargin{2};
-  if narg >= 3 & ~isempty(varargin{3});
+  if narg >= 3 && ~isempty(varargin{3});
     p = varargin{3};
   else
     p = rand(m,1)-0.5;
@@ -137,7 +137,7 @@ else
   end
   m = varargin{3};
   n = varargin{4};
-  if ~isreal(n) | abs(fix(n)) ~= n | ~isreal(m) | abs(fix(m)) ~= m
+  if ~isreal(n) || abs(fix(n)) ~= n || ~isreal(m) || abs(fix(m)) ~= m
     error('M and N must be positive integers.')
   end
   k=varargin{5};
@@ -185,7 +185,7 @@ gamma = 1/sqrt(2);   % Tolerance for iterated Gram-Schmidt.
 onesided = 0; t = 0; waitb = 0;
 
 % Parse options struct
-if ~isempty(options) & isstruct(options)
+if ~isempty(options) && isstruct(options)
   c = fieldnames(options);
   for i=1:length(c)
     if strmatch(c(i),'delta'), delta = getfield(options,'delta');  end
@@ -235,7 +235,7 @@ else
   alpha(1:j) = diag(B_k); if j>1 beta(2:j) = diag(B_k,-1); end
   beta(j+1) = norm(p);
   % Reorthogonalize p.
-  if j<k & beta(j+1)*delta < anorm*eps,
+  if j<k && beta(j+1)*delta < anorm*eps,
     fro = 1;
     ierr = j;
   end
@@ -316,7 +316,7 @@ for j=j0:k
     alpha(j) = norm(r); 
 
     % Extended local reorthogonalization    
-    if alpha(j)<gamma*beta(j) & elr & ~fro
+    if alpha(j)<gamma*beta(j) && elr && ~fro
       normold = alpha(j);
       stop = 0;
       while ~stop
@@ -343,14 +343,14 @@ for j=j0:k
       end			     
     end
     
-    if ~fro & alpha(j) ~= 0
+    if ~fro && alpha(j) ~= 0
       % Update estimates of the level of orthogonality for the
       %  columns 1 through j-1 in V.
       nu = update_nu(nu,mu,j,alpha,beta,anorm);
       numax(j) = max(abs(nu(1:j-1)));
     end
 
-    if j>1 & LANBPRO_TRUTH
+    if j>1 && LANBPRO_TRUTH
       NU(1:j-1,j-1) = nu(1:j-1);
       NUTRUE(1:j-1,j-1) = V(:,1:j-1)'*r/alpha(j);
     end
@@ -361,9 +361,9 @@ for j=j0:k
     
     % IF level of orthogonality is worse than delta THEN 
     %    Reorthogonalize v_j against some previous  v_i's, 0<=i<j.
-    if onesided~=-1 & ( fro | numax(j) > delta | force_reorth ) & alpha(j)~=0
+    if onesided~=-1 && ( fro || numax(j) > delta || force_reorth ) && alpha(j)~=0
       % Decide which vectors to orthogonalize against:
-      if fro | eta==0
+      if fro || eta==0
 	int = [1:j-1]';
       elseif force_reorth==0
 	int = compute_int(nu,j-1,delta,eta,0,0,0);
@@ -389,7 +389,7 @@ for j=j0:k
 
   
   % Check for convergence or failure to maintain semiorthogonality
-  if alpha(j) < max(n,m)*anorm*eps & j<k, 
+  if alpha(j) < max(n,m)*anorm*eps && j<k, 
     % If alpha is "small" we deflate by setting it
     % to 0 and attempt to restart with a basis for a new 
     % invariant subspace by replacing r with a random starting vector:
@@ -429,12 +429,12 @@ for j=j0:k
 	fro = 0;    % Turn off full reorthogonalization.
       end
     end       
-  elseif  j<k & ~fro & anorm*eps > delta*alpha(j)
+  elseif  j<k && ~fro && anorm*eps > delta*alpha(j)
 %    fro = 1;
     ierr = j;
   end
 
-  if j>1 & LANBPRO_TRUTH
+  if j>1 && LANBPRO_TRUTH
     NU_AFTER(1:j-1,j-1) = nu(1:j-1);
     NUTRUE_AFTER(1:j-1,j-1) = V(:,1:j-1)'*r/alpha(j);
   end
@@ -460,7 +460,7 @@ for j=j0:k
   end
   beta(j+1) = norm(p);
   % Extended local reorthogonalization
-  if beta(j+1)<gamma*alpha(j) & elr & ~fro
+  if beta(j+1)<gamma*alpha(j) && elr && ~fro
     normold = beta(j+1);
     stop = 0;
     while ~stop
@@ -490,7 +490,7 @@ for j=j0:k
   end
   
   
-  if ~fro & beta(j+1) ~= 0
+  if ~fro && beta(j+1) ~= 0
     % Update estimates of the level of orthogonality for the columns of V.
     mu = update_mu(mu,nu,j,alpha,beta,anorm);
     mumax(j) = max(abs(mu(1:j)));  
@@ -507,9 +507,9 @@ for j=j0:k
   
   % IF level of orthogonality is worse than delta THEN 
   %    Reorthogonalize u_{j+1} against some previous  u_i's, 0<=i<=j.
-  if onesided~=1 & (fro | mumax(j) > delta | force_reorth) & beta(j+1)~=0
+  if onesided~=1 && (fro || mumax(j) > delta || force_reorth) && beta(j+1)~=0
     % Decide which vectors to orthogonalize against.
-    if fro | eta==0
+    if fro || eta==0
       int = [1:j]';
     elseif force_reorth==0
       int = compute_int(mu,j,delta,eta,0,0,0); 
@@ -536,7 +536,7 @@ for j=j0:k
   end
   
   % Check for convergence or failure to maintain semiorthogonality
-  if beta(j+1) < max(m,n)*anorm*eps  & j<k,     
+  if beta(j+1) < max(m,n)*anorm*eps  && j<k,     
     % If beta is "small" we deflate by setting it
     % to 0 and attempt to restart with a basis for a new 
     % invariant subspace by replacing p with a random starting vector:
@@ -575,7 +575,7 @@ for j=j0:k
 	fro = 0;    % Turn off full reorthogonalization.
       end
     end       
-  elseif  j<k & ~fro & anorm*eps > delta*beta(j+1) 
+  elseif  j<k && ~fro && anorm*eps > delta*beta(j+1) 
 %    fro = 1;
     ierr = j;
   end  
@@ -596,7 +596,7 @@ end
 B_k = spdiags([alpha(1:k) [beta(2:k);0]],[0 -1],k,k);
 if nargout==1
   U = B_k;
-elseif k~=size(U,2) | k~=size(V,2)  
+elseif k~=size(U,2) || k~=size(V,2)  
   U = U(:,1:k);
   V = V(:,1:k);
 end
@@ -676,7 +676,7 @@ function x = pythag(y,z)
 % Christian H. Bischof, Argonne National Laboratory, 03/31/89.
 
 [m n] = size(y);
-if m>1 | n>1
+if m>1 || n>1
   y = y(:); z=z(:);
   rmax = max(abs([y z]'))';
   id=find(rmax==0);
